@@ -48,3 +48,67 @@ source .devops/bin/activate
 * Setup and Configure Kubernetes locally
 * Create Flask app in Container
 * Run via kubectl
+
+
+doker install
+============
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-docker.html
+sudo yum update -y
+sudo amazon-linux-extras install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+docker ps
+
+handolint install
+================
+sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64
+sudo chmod +x /bin/hadolint
+/bin/hadolint Dockerfile
+
+minikube install
+==================
+https://minikube.sigs.k8s.io/docs/start/
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+kubectl install
+====================
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+kubectl version --client --output=yaml
+minikube status
+docker --version
+
+==========
+==> about each directory and file
+-----------------------------------
+.circleci/config.yml	CircleCI configuration
+
+model_data	Trained model data for housing prices in Boston
+
+output_txt_files	Docker ,Kubernetes and task5 log output
+
+app.py	REST Endpoint for predicting housing prices in Boston
+
+Dockerfile	Dockerfile containing the application and its dependencies
+
+make_prediction.sh	Calls prediction REST endpoint and simulates sample prediction
+After running the container (docker app) we can able to run the prediction using the make_prediction.sh script
+
+Makefile	Build file of the project
+
+requirements.txt	Python requirements
+
+run_docker.sh	Shell script for creating and running docker container
+
+run_kubernetes.sh	Shell script to deploy docker container on Kubernetes cluster
+
+upload_docker.sh	Shell script for uploading locally built docker image to dockerhub repository
