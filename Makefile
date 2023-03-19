@@ -15,6 +15,14 @@ install:
 	pip install --upgrade pip &&\
 		pip install -r requirements.txt
 
+
+install-hadolint:
+                wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.17.5/hadolint-Linux-x86_64
+                        chmod +x /bin/hadolint
+install-minikube:
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
 test:
 	# Additional, optional, tests could go here
 	#python -m pytest -vv --cov=myrepolib tests/*.py
