@@ -1,35 +1,52 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
-version: 2
+version: 2.1
+
+orbs:
+  docker: circleci/docker@1.5.0
+
 jobs:
-  build:
+  init:
     docker:
-      # Use the same Docker base as the project
       - image: python:3.7.3-stretch
-    working_directory: ~/repo
     steps:
       - checkout
+      # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            - v1-dependencies-
+            - v1-dependencies-{{ checksum "hello_app/requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            # - v1-dependencies-
       - run:
-          name: install dependencies
+          name: Install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
+            python3 -m venv .devops-capstone
+            source .devops-capstone/bin/activate
             make install
-            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-            chmod +x /bin/hadolint
       - save_cache:
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-# run lint!
+            - ./.devops-capstone  # TODO: Include in cache the "bin" directory
+          key: v1-dependencies-{{ checksum "hello_app/requirements.txt" }}
       - run:
-          name: run lint
+          name: Run lint
           command: |
-            . venv/bin/activate
-            make lint            
+            source .devops-capstone/bin/activate
+            make lint 
+
+
+workflows:
+  default:
+    jobs:
+      - init        
+      - docker/publish:
+          matrix:
+            parameters:
+              image: [$DOCKER_LOGIN/hello-app]
+              path: [hello_app]
+              docker-context: [hello_app]
+              deploy: [true]
+              # We publish two images with different version tags: 
+              # - numbered version
+              # - "latest"
+              # tag: ['$(<hello_app/VERSION.txt)-${CIRCLE_SHA1:0:7}', 'latest']
+              tag: ['$(<hello_app/VERSION.txt)', 'latest']
+              update-description: [true]    
+          requires: [init]
